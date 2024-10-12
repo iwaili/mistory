@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Form</title>
+</head>
+<body>
+    <h1>Submit a Movie</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Movie List</h2>
+    <ul>
+        <ul>
+            {% for movie in movie_list %}
+            <li>
+                <strong>{{ movie.name }} ({{ movie.year }})</strong> - Rating: {{ movie.rating }}
+                <p>{{ movie.comments }}</p>
+                {% if movie.poster_url %}
+                <img src="{{ movie.poster_url }}" alt="{{ movie.name }} poster" style="max-width: 200px;">
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>        
+    </ul>
+</body>
+</html>
