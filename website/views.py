@@ -1,23 +1,15 @@
 from django.shortcuts import render
+from django.conf import settings
 from .forms import MovieForm
 from firebase_admin import firestore
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.keys import Keys
-import time
 import requests
-from bs4 import BeautifulSoup
-import re
-import urllib.parse
-
 # Initialize Firestore
 db = firestore.client()
 
 import requests
-from bs4 import BeautifulSoup
 
 def scrape_movie_poster(movie_name, movie_year):
-    api_key = "3cf3fede"  # Replace with your OMDb API key
+    api_key = settings.OMDB_API
     search_url = f"http://www.omdbapi.com/?t={movie_name}&y={movie_year}&apikey={api_key}"
 
     response = requests.get(search_url)

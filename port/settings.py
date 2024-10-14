@@ -123,12 +123,24 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+import environ
+import os
+
+# Initialize environment variables
+env = environ.Env()
+
+# Read .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# Access the API key using env
+OMDB_API = env('OMDB_API')
+FIREBASE_ADMIN_SDK_JSON = env('FIREBASE_ADMIN_SDK_JSON')
 
 import firebase_admin
 from firebase_admin import credentials
 
 # Path to your Firebase Admin SDK key file
-cred = credentials.Certificate('port/config/firebase-adminsdk.json')
+cred = credentials.Certificate(FIREBASE_ADMIN_SDK_JSON)
 
 # Initialize Firebase app
 firebase_admin.initialize_app(cred)
