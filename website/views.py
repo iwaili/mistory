@@ -8,7 +8,7 @@ import requests
 db = firestore.client()
 
 # Define the password (for example purposes, this should be more secure in real-world apps)
-REQUIRED_PASSWORD = "sexc"  # Replace with your actual password
+REQUIRED_PASSWORD = "your_secure_password"  # Replace with your actual password
 
 def scrape_movie_poster(movie_name, movie_year):
     api_key = settings.OMDB_API
@@ -30,58 +30,36 @@ def scrape_movie_poster(movie_name, movie_year):
         return None
 
 def home(request):
-    print("Home view accessed")  # Debug print
-    #db = initialize_firestore()  # Initialize Firestore
-    if db is None:
-        print("Firestore initialization failed")
-        return render(request, 'index.html', {'form': MovieForm(), 'movie_list': [], 'error_message': 'Firestore not available.'})
-
     if request.method == 'POST':
-        print("Request method is POST")  # Debug print
         form = MovieForm(request.POST)
         if form.is_valid():
-            print("Form is valid")  # Debug print
-            
             # Get form data
             name = form.cleaned_data['name']
             year = form.cleaned_data['year']
-            rating = float(form.cleaned_data['rating'])
+            rating = float(form.cleaned_data['rating'])  # Convert Decimal to float
             comments = form.cleaned_data['comments']
-            password = form.cleaned_data['password']
+            password = form.cleaned_data['password']  # Get the password field
 
-            # Check password
+            # Check if the password matches
             if password == REQUIRED_PASSWORD:
+                # Scrape movie poster from OMDB
                 poster_url = scrape_movie_poster(name, year)
 
-                # Try to add the movie to Firestore
-                try:
-                    db.collection('movies').add({
-                        'name': name,
-                        'year': year,
-                        'rating': rating,
-                        'comments': comments,
-                        'poster_url': poster_url
-                    })
-                    print("Movie added to Firestore")  # Debug print
-                except Exception as e:
-                    print(f"Failed to add movie to Firestore: {e}")
-                    return render(request, 'index.html', {'form': form, 'movie_list': [], 'error_message': 'Failed to add movie.'})
+                # Store movie details in Firestore
+                db.collection('movies').add({
+                    'name': name,
+                    'year': year,
+                    'rating': rating,  # Firestore expects float
+                    'comments': comments,
+                    'poster_url': poster_url  # Store the poster URL in Firestore
+                })
             else:
-                return render(request, 'index.html', {'form': form, 'movie_list': [], 'error_message': 'Incorrect password'})
+                # Password is incorrect, return None or an error
+                return render(request, 'index.html', {'form': form, 'error_message': 'Incorrect password'})
 
-        else:
-            print("Form is not valid")  # Debug print
-    else:
-        print("Request method is GET")  # Debug print
-    
-    # Attempt to retrieve movies from Firestore
-    try:
-        movies = db.collection('movies').stream()
-        movie_list = [doc.to_dict() for doc in movies]
-        print("Movies retrieved from Firestore")  # Debug print
-    except Exception as e:
-        print(f"Failed to retrieve movies: {e}")
-        movie_list = []
+    form = MovieForm()  # Empty form for display
+    # Retrieve all movies from Firestore
+    movies = db.collection('movies').stream()
+    movie_list = [doc.to_dict() for doc in movies]
 
-    return render(request, 'index.html', {'form': MovieForm(), 'movie_list': movie_list})
-
+    return render(request, 'index.html', {'form': form, 'movie_list': movie_list})
