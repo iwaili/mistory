@@ -21,7 +21,6 @@ def scrape_movie_poster(movie_name, movie_year):
         return None
     
     data = response.json()
-
     if data['Response'] == 'True':
         poster_url = data['Poster']  # Get the poster URL
         return poster_url
