@@ -135,7 +135,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Access the API key using env
 OMDB_API = env('OMDB_API')
 FIREBASE_ADMIN_SDK_JSON = env('FIREBASE_ADMIN_SDK_JSON')
-
+PASSWORD=env('PASSWORD')
 import firebase_admin
 from firebase_admin import credentials
 # Path to your Firebase Admin SDK key file

@@ -3,12 +3,13 @@ from django.conf import settings
 from .forms import MovieForm
 from firebase_admin import firestore
 import requests
+from datetime import datetime,time
 
 # Initialize Firestore
 db = firestore.client()
 
 # Define the password (for example purposes, this should be more secure in real-world apps)
-REQUIRED_PASSWORD = "your_secure_password"  # Replace with your actual password
+# # Replace with your actual password
 
 def scrape_movie_poster(movie_name, movie_year):
     api_key = settings.OMDB_API
@@ -36,12 +37,13 @@ def home(request):
             # Get form data
             name = form.cleaned_data['name']
             year = form.cleaned_data['year']
+            date = form.cleaned_data['date']
             rating = float(form.cleaned_data['rating'])  # Convert Decimal to float
             comments = form.cleaned_data['comments']
             password = form.cleaned_data['password']  # Get the password field
-
+            date_with_time = datetime.combine(date,time(0,0))
             # Check if the password matches
-            if password == REQUIRED_PASSWORD:
+            if password == settings.PASSWORD:
                 # Scrape movie poster from OMDB
                 poster_url = scrape_movie_poster(name, year)
 
@@ -49,6 +51,7 @@ def home(request):
                 db.collection('movies').add({
                     'name': name,
                     'year': year,
+                    'date': date_with_time,
                     'rating': rating,  # Firestore expects float
                     'comments': comments,
                     'poster_url': poster_url  # Store the poster URL in Firestore
@@ -59,7 +62,9 @@ def home(request):
 
     form = MovieForm()  # Empty form for display
     # Retrieve all movies from Firestore
-    movies = db.collection('movies').stream()
-    movie_list = [doc.to_dict() for doc in movies]
+    movies = db.collection('movies').order_by('date',direction=firestore.Query.DESCENDING).stream()
+    movies_list = []
+    for movie in movies:
+        movies_list.append(movie.to_dict())  # Convert to dictionary
 
-    return render(request, 'index.html', {'form': form, 'movie_list': movie_list})
+    return render(request,'index.html', {'form': form, 'movie_list': movies_list})
