@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Form</title>
+    <style>
+        /* CSS */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            margin: 0;
+            padding: 1rem;
+            line-height: 1.4;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            border-bottom: 2px solid #000;
+            padding-bottom: 0.3rem;
+            margin-bottom: 1rem;
+            box-shadow: 4px 4px 8px rgba(255, 255, 255, 0.8);
+        }
+
+        form {
+            background: #f8f8f8;
+            font-size: small;
+            padding: 1rem;
+            border: 1px solid #000;
+            margin: 1rem 0;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            box-shadow: 4px 4px 12px rgba(255, 255, 255, 0.9);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.4rem;
+            margin: 0.2rem 0;
+            border: 1px solid #000;
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 4px 4px 8px rgba(255, 255, 255, 0.8);
+        }
+
+        button {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 6px;
+            align-self: flex-start;
+            margin-top: 0.5rem;
+            box-shadow: 4px 4px 8px rgba(255, 255, 255, 0.8);
+        }
+
+        button:hover {
+            opacity: 0.8;
+            box-shadow: 6px 6px 12px rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+        }
+
+        ul {
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        li {
+            border: 1px solid #000;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 4px 12px rgba(255, 255, 255, 0.9);
+        }
+
+        .date-filter {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        img {
+            max-width: 50%;
+            border: 1px solid #000;
+            border-radius: 8px;
+            box-shadow: 4px 4px 12px rgba(255, 255, 255, 0.9);
+        }
+
+        p {
+            margin: 0.3rem 0;
+        }
+
+        .comment-section {
+            width: 100%;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .pagination button {
+            padding: 0.4rem 0.8rem;
+        }
+
+        /* Scroll-to-top button */
+        #scrollTopBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Form</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+
+        <h1>History</h1>
+
+        <!-- Sort By Dropdown -->
+        <label for="sortBy">Sort By</label>
+        <select id="sortBy" onchange="sortMovies()">
+            <option value="date">Date</option>
+            <option value="year">Year</option>
+            <option value="rating">Rating</option>
+            <option value="name">Name</option>
+        </select>
+
+        <!-- Date Filter Inputs -->
+        <div class="date-filter">
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" onchange="filterMovies()">
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" onchange="filterMovies()">
+        </div>
+
+        <ul id="movieList">
+            {% for movie in movie_list %}
+            <li data-date="{{ movie.date }}" data-year="{{ movie.year }}" data-rating="{{ movie.rating }}" data-name="{{ movie.name }}">
+                <strong>{{ movie.name }} ({{ movie.year }})</strong><br>
+                <span>Date: {{ movie.date|date:"F j, Y" }}</span><br>
+                <span>Rating: {{ movie.rating }}</span><br>
+                <p>{{ movie.comments }}</p>
+                {% if movie.poster_url %}
+                <div class="image-container">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.name }} poster">
+                </div>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div class="pagination" id="paginationControls"></div>
+        <button id="scrollTopBtn" onclick="scrollToTop()">Top</button>
+    </div>
+
+    <script>
+        const itemsPerPage = 20;
+        let currentPage = 1;
+        let filteredMoviesData = Array.from(document.querySelectorAll('#movieList li')); // Store initial movie list
+        
+        function sortMovies() {
+            const select = document.getElementById('sortBy');
+            const sortBy = select.value;
+
+            // Use filteredMoviesData instead of re-fetching the list
+            filteredMoviesData.sort((a, b) => {
+                let aValue = a.getAttribute(`data-${sortBy}`);
+                let bValue = b.getAttribute(`data-${sortBy}`);
+
+                // Sorting logic based on the attribute type
+                if (sortBy === 'date') {
+                    // For date sorting
+                    aValue = new Date(aValue);
+                    bValue = new Date(bValue);
+                    return bValue - aValue; // Descending order
+                } else if (sortBy === 'year' || sortBy === 'rating') {
+                    // For numerical sorting
+                    aValue = parseFloat(aValue);
+                    bValue = parseFloat(bValue);
+                    return bValue - aValue; // Descending order
+                }
+
+                return 0; // If sortBy is something else or not handled
+            });
+
+            // Clear the list and re-append the sorted movies
+            const list = document.getElementById('movieList');
+            while (list.firstChild) {
+                list.removeChild(list.firstChild);
+            }
+
+            // Append sorted movies to the list
+            filteredMoviesData.forEach(movie => list.appendChild(movie));
+            
+            // Reset to the first page after sorting
+            currentPage = 1;
+            displayMovies(currentPage);
+        }
+
+        function filterMovies() {
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
+            const list = document.getElementById("movieList");
+            const movies = Array.from(list.querySelectorAll("li"));
+
+            // Filter movies based on date range
+            filteredMoviesData = movies.filter(movie => {
+                const movieDate = new Date(movie.getAttribute("data-date"));
+                const isWithinRange =
+                    (!startDate || movieDate >= new Date(startDate)) &&
+                    (!endDate || movieDate <= new Date(endDate));
+                return isWithinRange;
+            });
+
+            // Sort and display filtered movies
+            sortMovies();
+        }
+
+        function displayMovies(page) {
+            const list = document.getElementById('movieList');
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            // Hide all movies first
+            filteredMoviesData.forEach(movie => movie.style.display = 'none');
+
+            // Show only the movies for the current page
+            const paginatedMovies = filteredMoviesData.slice(startIndex, endIndex);
+            paginatedMovies.forEach(movie => movie.style.display = 'block');
+
+            // Update pagination controls
+            updatePaginationControls(page);
+        }
+
+        function updatePaginationControls(page) {
+            const paginationControls = document.getElementById("paginationControls");
+            paginationControls.innerHTML = ""; // Clear previous controls
+
+            const totalPages = Math.ceil(filteredMoviesData.length / itemsPerPage);
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.innerText = i;
+                button.onclick = () => displayMovies(i);
+                if (i === page) button.disabled = true;
+                paginationControls.appendChild(button);
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show the scroll-to-top button when scrolling down
+        window.onscroll = function() {
+            const scrollTopBtn = document.getElementById("scrollTopBtn");
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollTopBtn.style.display = "block";
+            } else {
+                scrollTopBtn.style.display = "none";
+            }
+        };
+
+        // Initial display of movies
+        displayMovies(currentPage);
+    </script>
+</body>
+</html>

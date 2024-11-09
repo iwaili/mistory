@@ -5,141 +5,340 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Form</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #ffffff;
-            color: #000000;
+        /* Modern CSS with improved typography and spacing */
+        :root {
+            --primary-black: #000000;
+            --primary-white: #ffffff;
+            --light-gray: #f8f8f8;
+            --border-radius: 12px;
+            --box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --container-padding: clamp(1rem, 5vw, 2rem);
+            --form-max-width: 600px;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 1rem;
-            line-height: 1.4;
-            display: flex;
-            justify-content: center;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-white);
+            color: var(--primary-black);
+            margin: 0;
+            padding: var(--container-padding);
+            line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
+            margin: 0 auto;
         }
 
         h1 {
-            border-bottom: 2px solid #000;
-            padding-bottom: 0.3rem;
-            margin-bottom: 1rem;
-            box-shadow: 4px 4px 8px rgba(255, 255, 255, 0.8);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            letter-spacing: -0.5px;
+            border-bottom: 3px solid var(--primary-black);
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            font-weight: 800;
         }
 
+        /* Form specific styles */
         form {
-            background: #f8f8f8;
-            font-size: small;
-            padding: 1rem;
-            border: 1px solid #000;
-            margin: 1rem 0;
-            border-radius: 12px;
+            background: var(--light-gray);
+            padding: clamp(1rem, 3vw, 2rem);
+            border: 2px solid var(--primary-black);
+            margin: 2rem auto;
+            border-radius: var(--border-radius);
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            box-shadow: 4px 4px 12px rgba(255, 255, 255, 0.9);
+            gap: 1rem;
+            box-shadow: var(--box-shadow);
+            max-width: var(--form-max-width);
         }
 
-        input, textarea {
+        form p {
+            margin: 0.5rem 0;
             width: 100%;
-            padding: 0.4rem;
-            margin: 0.2rem 0;
-            border: 1px solid #000;
-            background: #fff;
-            border-radius: 6px;
-            box-shadow: 4px 4px 8px rgba(255, 255, 255, 0.8);
+        }
+
+        form label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.3rem 0;
+            border: 2px solid var(--primary-black);
+            background: var(--primary-white);
+            border-radius: calc(var(--border-radius) / 2);
+            font-size: 1rem;
+            transition: var(--transition);
+            max-width: 100%;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            box-shadow: var(--box-shadow);
+            border-color: #333;
         }
 
         button {
-            background: #000;
-            color: #fff;
+            background: var(--primary-black);
+            color: var(--primary-white);
             border: none;
-            padding: 0.5rem 1rem;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.2s;
-            border-radius: 6px;
+            transition: var(--transition);
+            border-radius: calc(var(--border-radius) / 2);
             align-self: flex-start;
-            margin-top: 0.5rem;
-            box-shadow: 4px 4px 8px rgba(255, 255, 255, 0.8);
+            width: auto;
         }
 
         button:hover {
-            opacity: 0.8;
-            box-shadow: 6px 6px 12px rgba(255, 255, 255, 0.9);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: var(--box-shadow);
+            background: #333;
         }
 
+        /* Movie list styles */
         ul {
             padding: 0;
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
+            gap: 1.5rem;
+            margin: 2rem 0;
+            width: 100%;
         }
 
         li {
-            border: 1px solid #000;
-            padding: 1rem;
-            background: #fff;
-            border-radius: 8px;
+            border: 2px solid var(--primary-black);
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: var(--primary-white);
+            border-radius: var(--border-radius);
             display: flex;
             flex-direction: column;
-            box-shadow: 4px 4px 12px rgba(255, 255, 255, 0.9);
+            gap: 0.8rem;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        li:hover {
+            transform: translateY(-3px);
+            box-shadow: 6px 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        li strong {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        /* Filter and sort controls */
+        .controls-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+            width: 100%;
+        }
+
+        .date-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .date-filter label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 100px;
+        }
+
+        .date-filter input {
+            flex: 1;
+            min-width: 200px;
         }
 
         .image-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 0.5rem;
+            margin-top: 1rem;
+            width: 100%;
         }
 
         img {
-            max-width: 50%;
-            border: 1px solid #000;
-            border-radius: 8px;
-            box-shadow: 4px 4px 12px rgba(255, 255, 255, 0.9);
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border: 2px solid var(--primary-black);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
         }
 
-        p {
-            margin: 0.3rem 0;
+        img:hover {
+            transform: scale(1.02);
         }
 
         .comment-section {
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            line-height: 1.6;
+            color: #333;
             width: 100%;
-            overflow: hidden;
-            word-wrap: break-word;
+        }
+
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 2rem 0;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .pagination button {
+            padding: 0.6rem 1rem;
+            min-width: 40px;
+        }
+
+        #scrollTopBtn {
+            position: fixed;
+            bottom: clamp(20px, 5vw, 30px);
+            right: clamp(20px, 5vw, 30px);
+            display: none;
+            background-color: var(--primary-black);
+            color: var(--primary-white);
+            border: none;
+            padding: clamp(0.8rem, 2vw, 1rem);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        #scrollTopBtn:hover {
+            transform: translateY(-3px);
+            background: #333;
+        }
+
+        #sortBy {
+            padding: 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            width: auto;
+            min-width: 200px;
+        }
+
+        /* Enhanced responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0;
+            }
+
+            form {
+                margin: 1rem 0;
+                padding: 1rem;
+            }
+
+            .date-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .date-filter label {
+                margin-bottom: 0.3rem;
+            }
+
+            .pagination button {
+                padding: 0.5rem;
+                min-width: 35px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            li {
+                padding: 1rem;
+            }
+
+            img {
+                max-width: 100%;
+            }
+
+            .pagination {
+                gap: 0.5rem;
+            }
+
+            .pagination button {
+                padding: 0.4rem;
+                min-width: 30px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Form</h1>
+        <h1>Movie Form</h1>
         <form method="POST">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Submit</button>
         </form>
 
-        <h1>History</h1>
+        <h1 id="movieHistoryHeading">Movie History</h1>
 
-        <!-- Sort By Dropdown -->
-        <label for="sortBy">Sort By</label>
-        <select id="sortBy" onchange="sortMovies()">
-            <option value="date">Date</option>
-            <option value="year">Year</option>
-            <option value="rating">Rating</option>
-            <option value="name">Name</option>
-        </select>
+        <div class="controls-wrapper">
+            <select id="sortBy" onchange="sortMovies()">
+                <option value="date">Sort by Date</option>
+                <option value="year">Sort by Year</option>
+                <option value="rating">Sort by Rating</option>
+                <option value="name">Sort by Name</option>
+            </select>
+        </div>
 
         <ul id="movieList">
             {% for movie in movie_list %}
             <li data-date="{{ movie.date }}" data-year="{{ movie.year }}" data-rating="{{ movie.rating }}" data-name="{{ movie.name }}">
-                <strong>{{ movie.name }} ({{ movie.year }})</strong><br>
-                <span>Date: {{ movie.date|date:"F j, Y" }}</span><br>
-                <span>Rating: {{ movie.rating }}</span><br>
-                <p>{{ movie.comments }}</p>
+                <strong>{{ movie.name }} ({{ movie.year }})</strong>
+                <span>Date: {{ movie.date|date:"F j, Y" }}</span>
+                <span>Rating: {{ movie.rating }}/10</span>
+                <div class="comment-section">
+                    <p>{{ movie.comments }}</p>
+                </div>
                 {% if movie.poster_url %}
                 <div class="image-container">
                     <img src="{{ movie.poster_url }}" alt="{{ movie.name }} poster">
@@ -147,42 +346,85 @@
                 {% endif %}
             </li>
             {% endfor %}
-        </ul>        
+        </ul>
+
+        <div class="pagination" id="paginationControls"></div>
+        <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
     </div>
 
     <script>
+        const itemsPerPage = 20;
+        let currentPage = 1;
+        
         function sortMovies() {
-            const select = document.getElementById('sortBy');
-            const sortBy = select.value;
-            const list = document.getElementById('movieList');
-            const movies = Array.from(list.getElementsByTagName('li'));
+            const sortBy = document.getElementById("sortBy").value;
+            const movieList = document.getElementById("movieList");
+            const movies = Array.from(movieList.querySelectorAll("li"));
 
-            // Sort the movies based on the selected option in descending order
             movies.sort((a, b) => {
-                let aValue = a.getAttribute(`data-${sortBy}`);
-                let bValue = b.getAttribute(`data-${sortBy}`);
-
-                // Convert to appropriate types for sorting
-                if (sortBy === 'date') {
-                    aValue = new Date(aValue);
-                    bValue = new Date(bValue);
-                } else if (sortBy === 'year' || sortBy === 'rating') {
-                    aValue = parseFloat(aValue);
-                    bValue = parseFloat(bValue);
+                switch (sortBy) {
+                    case "date":
+                        return new Date(a.getAttribute("data-date")) - new Date(b.getAttribute("data-date"));
+                    case "year":
+                        return a.getAttribute("data-year") - b.getAttribute("data-year");
+                    case "rating":
+                        return b.getAttribute("data-rating") - a.getAttribute("data-rating");
+                    case "name":
+                        return a.getAttribute("data-name").localeCompare(b.getAttribute("data-name"));
+                    default:
+                        return 0;
                 }
-
-                // Change the comparison for descending order
-                if (aValue < bValue) return 1;
-                if (aValue > bValue) return -1;
-                return 0;
             });
+            // Clear the list and re-add sorted items
+            movieList.innerHTML = "";
+            movies.forEach(movie => movieList.appendChild(movie));
 
-            // Clear the list and re-append the sorted movies
-            while (list.firstChild) {
-                list.removeChild(list.firstChild);
-            }
-            movies.forEach(movie => list.appendChild(movie));
+            // Re-display the first page after sorting
+            currentPage = 1;
+            displayMovies(currentPage);
         }
+
+        function displayMovies(page) {
+            const movies = document.querySelectorAll('#movieList li');
+            movies.forEach((movie, index) => {
+                movie.style.display = (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) ? '' : 'none';
+            });
+            updatePagination();
+
+            // Scroll to "Movie History" section
+            document.getElementById('movieHistoryHeading').scrollIntoView({ behavior: 'smooth' });
+        }
+
+
+        function updatePagination() {
+            const movies = document.querySelectorAll('#movieList li');
+            const pageCount = Math.ceil(movies.length / itemsPerPage);
+            const paginationControls = document.getElementById('paginationControls');
+            paginationControls.innerHTML = '';
+
+            for (let i = 1; i <= pageCount; i++) {
+                const button = document.createElement('button');
+                button.innerText = i;
+                button.onclick = () => {
+                    currentPage = i;
+                    displayMovies(currentPage);
+                };
+                if (i === currentPage) button.style.fontWeight = 'bold';
+                paginationControls.appendChild(button);
+            }
+        }
+
+        window.onscroll = () => {
+            document.getElementById('scrollTopBtn').style.display = 
+                (window.scrollY > 200) ? 'block' : 'none';
+        };
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initial display
+        displayMovies(currentPage);
     </script>
 </body>
 </html>
